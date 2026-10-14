@@ -79,14 +79,6 @@ header .sub { font-size: 10px; color: var(--gold); text-transform: uppercase; le
 }
 .export-btn:hover { background: #000; }
 
-/* ── Min-usage filter toggle ── */
-.min-filter {
-  display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted);
-}
-.min-filter select {
-  border: 1px solid var(--border); background: var(--bg); border-radius: 5px;
-  padding: 3px 6px; font-size: 11px; color: var(--text); outline: none; cursor: pointer;
-}
 
 /* ── Table wrap ── */
 .wrap { overflow: auto; height: calc(100vh - 106px); }
@@ -205,18 +197,6 @@ tfoot td.mc  { color: var(--accent-dk); text-align: center; }
     <button class="pill active" id="sName"  onclick="setSort('name')">Name</button>
     <button class="pill" id="sCount" onclick="setSort('count')">Modules ↕</button>
     <button class="pill" id="sDue"   onclick="setSort('due')">Due ↕</button>
-  </div>
-
-  <div class="sep"></div>
-
-  <div class="min-filter">
-    Show modules used by ≥
-    <select id="minUse" onchange="render()">
-      <option value="1">1 client</option>
-      <option value="2" selected>2 clients</option>
-      <option value="3">3 clients</option>
-      <option value="5">5 clients</option>
-    </select>
   </div>
 
   <div class="sep"></div>
@@ -365,15 +345,9 @@ function dotBorder(total, complete) {
 function render() {
   const cQ   = document.getElementById('clientQ').value.toLowerCase();
   const mQ   = document.getElementById('modQ').value.toLowerCase();
-  const minU = parseInt(document.getElementById('minUse').value, 10);
 
   const clients = buildClients(RAW);
-  const modFreq = {};
-  for (const c of clients) for (const m of Object.keys(c.mods)) modFreq[m]=(modFreq[m]||0)+1;
-
-  const visMods = ALL_MODS.filter(m =>
-    m.toLowerCase().includes(mQ) && (modFreq[m]||0) >= minU
-  );
+  const visMods = ALL_MODS.filter(m => m.toLowerCase().includes(mQ));
   const visClients = sorted(clients.filter(c => c.name.toLowerCase().includes(cQ)));
 
   // thead
@@ -473,11 +447,8 @@ function render() {
 function exportCSV() {
   const cQ   = document.getElementById('clientQ').value.toLowerCase();
   const mQ   = document.getElementById('modQ').value.toLowerCase();
-  const minU = parseInt(document.getElementById('minUse').value, 10);
   const clients = buildClients(RAW);
-  const modFreq = {};
-  for (const c of clients) for (const m of Object.keys(c.mods)) modFreq[m]=(modFreq[m]||0)+1;
-  const mods = ALL_MODS.filter(m => m.toLowerCase().includes(mQ) && (modFreq[m]||0) >= minU);
+  const mods = ALL_MODS.filter(m => m.toLowerCase().includes(mQ));
   const vis  = sorted(clients.filter(c => c.name.toLowerCase().includes(cQ)));
   const e = v => `"${String(v??'').replace(/"/g,'""')}"`;
   const rows = [['Client','Owner','Due Date','Module Count',...mods].map(e).join(',')];
