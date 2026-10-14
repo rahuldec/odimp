@@ -46,43 +46,41 @@ async function asanaAll(base, token) {
   return items;
 }
 
+// Fetch task counts for a single section (includes completed tasks).
+async function fetchSectionCounts(sectionGid, token) {
+  try {
+    const tasks = await asanaAll(
+      `https://app.asana.com/api/1.0/sections/${sectionGid}/tasks` +
+      `?opt_fields=completed&completed_since=2000-01-01T00%3A00%3A00.000Z`,
+      token
+    );
+    const total    = tasks.length;
+    const complete = tasks.filter(t => t.completed).length;
+    return { total, complete };
+  } catch {
+    return { total: 0, complete: 0 };
+  }
+}
+
 async function fetchProjectData(p, token) {
   try {
-    // Sections and tasks in parallel
-    const [sectionsRaw, tasksRaw] = await Promise.all([
-      asanaAll(
-        `https://app.asana.com/api/1.0/projects/${p.gid}/sections?opt_fields=name,gid`,
-        token
-      ),
-      asanaAll(
-        `https://app.asana.com/api/1.0/projects/${p.gid}/tasks?opt_fields=completed,memberships.section.gid&completed_since=2000-01-01T00:00:00.000Z`,
-        token
-      ),
-    ]);
+    const sectionsRaw = await asanaAll(
+      `https://app.asana.com/api/1.0/projects/${p.gid}/sections?opt_fields=name,gid`,
+      token
+    );
 
-    // Count tasks per section gid
-    const counts = {};
-    for (const t of tasksRaw) {
-      for (const m of (t.memberships || [])) {
-        const sgid = m.section && m.section.gid;
-        if (!sgid) continue;
-        if (!counts[sgid]) counts[sgid] = { total: 0, complete: 0 };
-        counts[sgid].total++;
-        if (t.completed) counts[sgid].complete++;
-      }
-    }
+    // Fetch task counts per section in parallel (completed_since at section level is reliable).
+    const sections = await Promise.all(sectionsRaw.map(async s => {
+      const { total, complete } = await fetchSectionCounts(s.gid, token);
+      return { name: s.name, gid: s.gid, total, complete };
+    }));
 
     return {
       name:   p.name,
       gid:    p.gid,
-      due_on: p.due_on  || null,
-      owner:  p.owner   ? p.owner.name : null,
-      sections: sectionsRaw.map(s => ({
-        name:     s.name,
-        gid:      s.gid,
-        total:    (counts[s.gid] || {}).total    || 0,
-        complete: (counts[s.gid] || {}).complete || 0,
-      })),
+      due_on: p.due_on || null,
+      owner:  p.owner  ? p.owner.name : null,
+      sections,
     };
   } catch {
     return { name: p.name, gid: p.gid, due_on: null, owner: null, sections: [] };
@@ -98,7 +96,7 @@ async function fetchData(token) {
   );
   const projects = raw.filter(x => x.resource_type === 'project');
 
-  // Fan out per project in batches of 5 to stay under Asana rate limit
+  // Fan out per project in batches of 5 to stay under Asana rate limit.
   const BATCH = 5;
   const clients = [];
   for (let i = 0; i < projects.length; i += BATCH) {
