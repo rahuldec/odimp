@@ -55,7 +55,7 @@ async function fetchProjectData(p, token) {
         token
       ),
       asanaAll(
-        `https://app.asana.com/api/1.0/projects/${p.gid}/tasks?opt_fields=completed,memberships.section.gid`,
+        `https://app.asana.com/api/1.0/projects/${p.gid}/tasks?opt_fields=completed,memberships.section.gid&completed_since=1970-01-01`,
         token
       ),
     ]);
