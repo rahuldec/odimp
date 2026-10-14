@@ -3,56 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Implementation Module Dashboard</title>
+<title>Implementation Module Dashboard — Okie Dokie</title>
+<link rel="icon" type="image/png" href="https://okiedokie-erp-images.s3.ap-south-1.amazonaws.com/Okie%20Dokie/2025/12/sourceURL/26aebcbe10f4ac5a3e8b-611ed1b9032568edd4f3-Okie_Dokie_App_icon__2___2_-removebg-preview.png">
 <style>
   :root {
-    --bg: #f5f7fa;
+    --bg: #fff8f5;
     --surface: #ffffff;
-    --border: #e2e8f0;
-    --text: #1a202c;
-    --text-muted: #718096;
-    --accent: #4f46e5;
-    --yes-bg: #d1fae5;
-    --yes-fg: #065f46;
-    --no-bg: #f1f5f9;
-    --no-fg: #94a3b8;
-    --header-bg: #1e293b;
-    --header-fg: #f8fafc;
-    --shadow: 0 1px 3px rgba(0,0,0,.08);
+    --border: #f0d9ce;
+    --text: #2d0a00;
+    --text-muted: #8c4a2f;
+    --accent: #e8571a;
+    --accent-dark: #c44213;
+    --yes-bg: #fde8d8;
+    --yes-fg: #c44213;
+    --no-bg: #faf5f2;
+    --no-fg: #c9a090;
+    --header-bg: #4a1200;
+    --header-fg: #fff8f5;
+    --header-sub: #f5b800;
+    --shadow: 0 1px 3px rgba(74,18,0,.1);
     --radius: 8px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 13px; }
 
-  header { background: var(--header-bg); color: var(--header-fg); padding: 16px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  header h1 { font-size: 18px; font-weight: 600; flex: 1; }
-  .stats { display: flex; gap: 20px; font-size: 12px; color: #94a3b8; }
-  .stats span b { color: #e2e8f0; }
+  header { background: var(--header-bg); color: var(--header-fg); padding: 14px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  header img.logo { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  header .title-block { flex: 1; }
+  header h1 { font-size: 17px; font-weight: 700; letter-spacing: .01em; }
+  header .subtitle { font-size: 11px; color: var(--header-sub); margin-top: 1px; letter-spacing: .04em; text-transform: uppercase; }
+  .stats { display: flex; gap: 20px; font-size: 12px; color: #c9a090; }
+  .stats span b { color: #fde8d8; }
 
   .toolbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  .toolbar input { border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 12px; width: 220px; outline: none; }
-  .toolbar input:focus { border-color: var(--accent); }
-  .legend { display: flex; gap: 12px; margin-left: auto; font-size: 11px; }
+  .toolbar input { border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 12px; width: 220px; outline: none; background: var(--bg); color: var(--text); }
+  .toolbar input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,87,26,.12); }
+  .legend { display: flex; gap: 12px; margin-left: auto; font-size: 11px; color: var(--text-muted); }
   .legend span { display: flex; align-items: center; gap: 4px; }
   .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
-  .dot-yes { background: var(--yes-bg); border: 1px solid #6ee7b7; }
+  .dot-yes { background: var(--yes-bg); border: 1px solid #f4a87a; }
   .dot-no  { background: var(--no-bg);  border: 1px solid var(--border); }
 
   .wrap { overflow: auto; max-height: calc(100vh - 120px); }
 
   table { border-collapse: collapse; white-space: nowrap; }
   thead { position: sticky; top: 0; z-index: 10; }
-  th.corner { position: sticky; left: 0; z-index: 20; background: var(--header-bg); min-width: 220px; padding: 8px 12px; font-size: 11px; color: #64748b; text-align: left; }
+  th.corner { position: sticky; left: 0; z-index: 20; background: var(--header-bg); min-width: 220px; padding: 8px 12px; font-size: 11px; color: #c9a090; text-align: left; }
   th.mod-head {
     background: var(--header-bg); color: var(--header-fg);
     padding: 0; min-width: 38px; max-width: 38px; height: 130px; vertical-align: bottom;
-    border-left: 1px solid #334155;
+    border-left: 1px solid #6b2200;
   }
   th.mod-head div {
     transform: rotate(-60deg) translateX(-8px);
     transform-origin: bottom left;
     white-space: nowrap; font-size: 11px; font-weight: 500;
-    padding-bottom: 4px; color: #e2e8f0;
+    padding-bottom: 4px; color: #fde8d8;
     width: 130px;
   }
 
@@ -63,9 +69,9 @@
     overflow: hidden; text-overflow: ellipsis; z-index: 5;
     cursor: default;
   }
-  td.client-name:hover { background: #f0f9ff; }
-  tr:hover td { background: #fafbff; }
-  tr:hover td.client-name { background: #e0f2fe; }
+  td.client-name:hover { background: #fff0e8; }
+  tr:hover td { background: #fffaf7; }
+  tr:hover td.client-name { background: #ffe8d6; }
 
   td.cell {
     text-align: center; border-bottom: 1px solid var(--border);
@@ -82,9 +88,9 @@
   .count-badge {
     display: inline-block; background: var(--accent); color: #fff;
     border-radius: 10px; font-size: 10px; padding: 1px 6px; margin-left: 6px;
-    vertical-align: middle;
+    vertical-align: middle; font-weight: 600;
   }
-  .mod-count { font-size: 10px; color: #64748b; display: block; margin-top: 2px; }
+  .mod-count { font-size: 10px; color: var(--text-muted); display: block; margin-top: 2px; }
 
   .hidden { display: none !important; }
   tfoot tr td { position: sticky; bottom: 0; border-top: 2px solid var(--border); }
@@ -93,7 +99,11 @@
 <body>
 
 <header>
-  <h1>Implementation Module Dashboard</h1>
+  <img class="logo" src="https://okiedokie-erp-images.s3.ap-south-1.amazonaws.com/Okie%20Dokie/2025/12/sourceURL/26aebcbe10f4ac5a3e8b-611ed1b9032568edd4f3-Okie_Dokie_App_icon__2___2_-removebg-preview.png" alt="Okie Dokie">
+  <div class="title-block">
+    <h1>Implementation Module Dashboard</h1>
+    <div class="subtitle">Okie Dokie Campus Automation</div>
+  </div>
   <div class="stats" id="stats"></div>
 </header>
 
@@ -281,16 +291,16 @@ function renderTable() {
   const td0f = document.createElement('td');
   td0f.className = 'client-name';
   td0f.style.fontWeight = '600';
-  td0f.style.color = '#64748b';
+  td0f.style.color = '#8c4a2f';
   td0f.textContent = 'Total clients using';
   tr2.appendChild(td0f);
   for (const m of visibleMods) {
     const td = document.createElement('td');
     td.className = 'cell';
-    td.style.background = '#f8fafc';
-    td.style.fontWeight = '600';
+    td.style.background = '#fdf0e8';
+    td.style.fontWeight = '700';
     td.style.fontSize = '11px';
-    td.style.color = '#475569';
+    td.style.color = '#c44213';
     td.textContent = modCount[m] || 0;
     tr2.appendChild(td);
   }
