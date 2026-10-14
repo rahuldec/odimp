@@ -15,9 +15,9 @@
   --accent:    #e8571a;
   --accent-dk: #c44213;
   --orange:    #e8571a;
-  --col-head:  #334155;   /* medium slate — readable, not pitch black */
-  --col-fg:    #f1f5f9;
-  --col-sub:   #94a3b8;
+  --col-head:  #1c1917;   /* warm charcoal — anchors the orange brand */
+  --col-fg:    #fde8da;
+  --col-sub:   #c9856a;
   --row-head:  #ffffff;
   --warn:      #dc2626;
   --gold:      #fef3c7;
@@ -73,11 +73,11 @@ header .sub { font-size: 10px; color: var(--gold); text-transform: uppercase; le
 .swatch { width: 12px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,.08); flex-shrink: 0; }
 
 .export-btn {
-  background: var(--col-head); color: #fff; border: none;
+  background: var(--accent-dk); color: #fff; border: none;
   border-radius: 6px; padding: 5px 11px; font-size: 11px; cursor: pointer;
   white-space: nowrap; transition: background .15s;
 }
-.export-btn:hover { background: #000; }
+.export-btn:hover { background: var(--col-head); }
 
 
 /* ── Table wrap ── */
