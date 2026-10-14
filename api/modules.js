@@ -2,6 +2,11 @@
 // - sections (modules) + per-section task counts (complete / total)
 // - project due_on, owner, gid for linking and sorting
 // Cached 5 min server-side; token refreshed on every cold request.
+//
+// Supports two project structures:
+// A) Sections = modules (standard): each section is a module, tasks within it count progress
+// B) Tasks = modules (container pattern): a "Modulewise Implementation Status" section holds
+//    tasks whose names are the modules; completion = task.completed (binary)
 
 const PORTFOLIO_GID = process.env.ASANA_PORTFOLIO_GID;
 const CLIENT_ID     = process.env.ASANA_CLIENT_ID;
@@ -10,6 +15,15 @@ const REFRESH_TOKEN = process.env.ASANA_REFRESH_TOKEN;
 
 let cache = null;
 const CACHE_MS = 5 * 60 * 1000;
+
+// Section names that act as containers: their tasks are the real modules.
+const CONTAINER_SECTIONS = new Set([
+  'modulewise implementation status',
+  'module-wise implementation status',
+  'module wise implementation status',
+  'implementation status',
+  'modules',
+]);
 
 async function getToken() {
   const r = await fetch('https://app.asana.com/-/oauth_token', {
@@ -33,7 +47,6 @@ async function asanaGet(url, token) {
   return r.json();
 }
 
-// Fetch all pages of an Asana list endpoint into a flat array.
 async function asanaAll(base, token) {
   const items = [];
   let offset = '';
@@ -46,17 +59,18 @@ async function asanaAll(base, token) {
   return items;
 }
 
-// Fetch task counts for a single section (includes completed tasks).
+// Fetch task counts (complete + incomplete) for a standard module section.
 async function fetchSectionCounts(sectionGid, token) {
   try {
     const tasks = await asanaAll(
       `https://app.asana.com/api/1.0/sections/${sectionGid}/tasks` +
-      `?opt_fields=completed&completed_since=2000-01-01T00%3A00%3A00.000Z`,
+      `?opt_fields=completed&completed_since=2000-01-01T00:00:00.000Z`,
       token
     );
-    const total    = tasks.length;
-    const complete = tasks.filter(t => t.completed).length;
-    return { total, complete };
+    return {
+      total:    tasks.length,
+      complete: tasks.filter(t => t.completed).length,
+    };
   } catch {
     return { total: 0, complete: 0 };
   }
@@ -69,11 +83,32 @@ async function fetchProjectData(p, token) {
       token
     );
 
-    // Fetch task counts per section in parallel (completed_since at section level is reliable).
-    const sections = await Promise.all(sectionsRaw.map(async s => {
-      const { total, complete } = await fetchSectionCounts(s.gid, token);
-      return { name: s.name, gid: s.gid, total, complete };
-    }));
+    const sections = [];
+
+    for (const s of sectionsRaw) {
+      const key = s.name.trim().toLowerCase();
+
+      if (CONTAINER_SECTIONS.has(key)) {
+        // Structure B: tasks within this section are the modules.
+        // Use task.completed as binary progress (no sub-task drilling needed).
+        const tasks = await asanaAll(
+          `https://app.asana.com/api/1.0/sections/${s.gid}/tasks?opt_fields=name,completed`,
+          token
+        );
+        for (const t of tasks) {
+          sections.push({
+            name:     t.name,
+            gid:      t.gid,
+            total:    1,
+            complete: t.completed ? 1 : 0,
+          });
+        }
+      } else {
+        // Structure A: section itself is the module; count tasks inside it.
+        const { total, complete } = await fetchSectionCounts(s.gid, token);
+        sections.push({ name: s.name, gid: s.gid, total, complete });
+      }
+    }
 
     return {
       name:   p.name,
@@ -88,7 +123,6 @@ async function fetchProjectData(p, token) {
 }
 
 async function fetchData(token) {
-  // Portfolio items: need name, gid, due_on, owner
   const raw = await asanaAll(
     `https://app.asana.com/api/1.0/portfolios/${PORTFOLIO_GID}/items` +
     `?opt_fields=name,gid,resource_type,due_on,owner.name`,
@@ -96,7 +130,6 @@ async function fetchData(token) {
   );
   const projects = raw.filter(x => x.resource_type === 'project');
 
-  // Fan out per project in batches of 5 to stay under Asana rate limit.
   const BATCH = 5;
   const clients = [];
   for (let i = 0; i < projects.length; i += BATCH) {
@@ -110,6 +143,29 @@ async function fetchData(token) {
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
+
+  // ?debugProject=<gid> — inspect raw sections + first section tasks
+  if (req.query && req.query.debugProject) {
+    try {
+      const token = await getToken();
+      const pgid = req.query.debugProject;
+      const sections = await asanaAll(
+        `https://app.asana.com/api/1.0/projects/${pgid}/sections?opt_fields=name,gid`, token
+      );
+      const results = [];
+      for (const s of sections.slice(0, 3)) {
+        const tasks = await asanaAll(
+          `https://app.asana.com/api/1.0/sections/${s.gid}/tasks?opt_fields=name,completed&completed_since=2000-01-01T00:00:00.000Z`,
+          token
+        );
+        results.push({ section: s, taskCount: tasks.length, sample: tasks.slice(0, 3) });
+      }
+      return res.json({ sections, results });
+    } catch (e) {
+      return res.status(500).json({ ok: false, error: e.message });
+    }
+  }
+
   try {
     if (cache && cache.expiresAt > Date.now())
       return res.json({ ok: true, clients: cache.clients });
