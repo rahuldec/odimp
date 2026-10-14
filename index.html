@@ -7,157 +7,177 @@
 <link rel="icon" type="image/png" href="https://okiedokie-erp-images.s3.ap-south-1.amazonaws.com/Okie%20Dokie/2025/12/sourceURL/26aebcbe10f4ac5a3e8b-611ed1b9032568edd4f3-Okie_Dokie_App_icon__2___2_-removebg-preview.png">
 <style>
 :root {
-  --bg:          #fff8f5;
-  --surface:     #ffffff;
-  --border:      #f0d9ce;
-  --text:        #2d0a00;
-  --muted:       #8c4a2f;
-  --accent:      #e8571a;
-  --accent-dk:   #c44213;
-  --header-bg:   #e8571a;
-  --header-fg:   #ffffff;
-  --gold:        #fff0d6;
-  --yes100:      #e8571a;
-  --yes75:       #f4895a;
-  --yes50:       #f9b899;
-  --yes25:       #fde0d0;
-  --yes0:        #fff0e8;
-  --no-bg:       #faf5f2;
-  --no-fg:       #d4b0a0;
-  --attn-border: #e8571a;
-  --warn:        #dc2626;
+  --bg:        #f8fafc;
+  --surface:   #ffffff;
+  --border:    #e2e8f0;
+  --text:      #0f172a;
+  --muted:     #64748b;
+  --accent:    #e8571a;
+  --accent-dk: #c44213;
+  --orange:    #e8571a;
+  --col-head:  #0f172a;   /* dark slate for column headers */
+  --col-fg:    #f1f5f9;
+  --col-sub:   #475569;
+  --row-head:  #ffffff;
+  --warn:      #dc2626;
+  --gold:      #fef3c7;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-       background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.4; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg); color: var(--text); font-size: 13px;
+}
 
 /* ── Header ── */
 header {
-  background: var(--header-bg); color: var(--header-fg);
-  padding: 13px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  position: sticky; top: 0; z-index: 30;
-  box-shadow: 0 2px 8px rgba(232,87,26,.4);
+  background: var(--orange); color: #fff;
+  padding: 11px 20px; display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 40;
+  box-shadow: 0 2px 8px rgba(232,87,26,.3);
 }
-header img.logo { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-header .title-block { flex: 1; min-width: 0; }
-header h1 { font-size: 16px; font-weight: 700; }
-header .subtitle { font-size: 10px; color: var(--gold); text-transform: uppercase; letter-spacing: .06em; margin-top: 1px; }
-.hstats { display: flex; gap: 16px; font-size: 12px; color: rgba(255,255,255,.7); }
-.hstats b { color: #ffffff; }
+header img.logo { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+header .tb { flex: 1; min-width: 0; }
+header h1  { font-size: 15px; font-weight: 700; line-height: 1.2; }
+header .sub { font-size: 10px; color: var(--gold); text-transform: uppercase; letter-spacing: .06em; }
+.hstats { display: flex; gap: 14px; font-size: 12px; color: rgba(255,255,255,.7); }
+.hstats b { color: #fff; }
 
 /* ── Toolbar ── */
 .toolbar {
   background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 8px 20px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-  position: sticky; top: 62px; z-index: 29;
+  padding: 7px 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  position: sticky; top: 57px; z-index: 39;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 .toolbar input {
-  border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px;
-  font-size: 12px; width: 180px; outline: none; background: var(--bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: 5px 10px; font-size: 12px; width: 170px; outline: none;
+  background: var(--bg); color: var(--text);
 }
-.toolbar input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,87,26,.12); }
-.sort-group { display: flex; gap: 4px; }
-.sort-btn {
-  border: 1px solid var(--border); background: var(--bg); color: var(--muted);
-  border-radius: 6px; padding: 5px 10px; font-size: 11px; cursor: pointer;
-  display: flex; align-items: center; gap: 4px; white-space: nowrap;
-}
-.sort-btn:hover { border-color: var(--accent); color: var(--accent); }
-.sort-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.spacer { flex: 1; }
-.export-btn {
-  background: var(--accent); color: #fff; border: none;
-  border-radius: 6px; padding: 5px 12px; font-size: 11px; cursor: pointer;
-  display: flex; align-items: center; gap: 5px;
-}
-.export-btn:hover { background: var(--accent-dk); }
+.toolbar input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(232,87,26,.15); }
 
-/* ── Legend ── */
-.legend {
-  display: flex; gap: 10px; align-items: center; font-size: 11px; color: var(--muted);
-  flex-wrap: wrap;
+.pill-group { display: flex; gap: 3px; }
+.pill {
+  border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+  border-radius: 20px; padding: 4px 10px; font-size: 11px; cursor: pointer; white-space: nowrap;
+  transition: all .15s;
 }
-.litem { display: flex; align-items: center; gap: 4px; }
-.lswatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,.1); flex-shrink:0; }
+.pill:hover  { border-color: var(--accent); color: var(--accent); }
+.pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.sep { width: 1px; background: var(--border); margin: 0 2px; align-self: stretch; }
+.spacer { flex: 1; }
+
+.legend { display: flex; gap: 8px; align-items: center; font-size: 11px; color: var(--muted); flex-wrap: wrap; }
+.li { display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+.swatch { width: 12px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,.08); flex-shrink: 0; }
+
+.export-btn {
+  background: var(--col-head); color: #fff; border: none;
+  border-radius: 6px; padding: 5px 11px; font-size: 11px; cursor: pointer;
+  white-space: nowrap; transition: background .15s;
+}
+.export-btn:hover { background: #000; }
+
+/* ── Min-usage filter toggle ── */
+.min-filter {
+  display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted);
+}
+.min-filter select {
+  border: 1px solid var(--border); background: var(--bg); border-radius: 5px;
+  padding: 3px 6px; font-size: 11px; color: var(--text); outline: none; cursor: pointer;
+}
 
 /* ── Table wrap ── */
-.wrap { overflow: auto; height: calc(100vh - 118px); }
+.wrap { overflow: auto; height: calc(100vh - 106px); }
 
 table { border-collapse: collapse; white-space: nowrap; }
 
-/* Sticky column header row */
+/* Column header row */
 thead { position: sticky; top: 0; z-index: 20; }
+
 th.corner {
   position: sticky; left: 0; z-index: 25;
-  background: var(--header-bg); min-width: 260px; padding: 8px 12px;
-  font-size: 10px; color: rgba(255,255,255,.7); text-align: left; border-right: 2px solid rgba(0,0,0,.15);
+  background: var(--col-head); min-width: 280px; padding: 6px 14px;
+  font-size: 10px; color: var(--col-sub); text-align: left;
+  border-right: 1px solid #1e293b;
 }
-th.mod-head {
-  background: var(--header-bg);
-  padding: 0; min-width: 40px; max-width: 40px; height: 140px; vertical-align: bottom;
-  border-left: 1px solid rgba(0,0,0,.15); cursor: pointer;
+
+th.mh {
+  background: var(--col-head);
+  padding: 0; min-width: 32px; max-width: 32px; height: 120px;
+  vertical-align: bottom; border-left: 1px solid #1e293b; cursor: default;
 }
-th.mod-head:hover div { color: var(--gold); }
-th.mod-head div {
-  transform: rotate(-60deg) translateX(-8px);
+th.mh div.rot {
+  transform: rotate(-55deg) translateX(-6px);
   transform-origin: bottom left;
   white-space: nowrap; font-size: 11px; font-weight: 500;
-  padding-bottom: 6px; color: rgba(255,255,255,.9); width: 140px;
+  padding-bottom: 6px; color: var(--col-fg); width: 120px;
+  display: flex; flex-direction: column;
 }
-th.mod-head .mod-total {
-  display: block; font-size: 9px; color: rgba(255,255,255,.6); font-weight: 400; margin-top: 2px;
+th.mh div.rot span.cnt {
+  font-size: 9px; color: var(--col-sub); font-weight: 400; margin-top: 1px;
 }
 
 /* Client rows */
-td.client-cell {
-  position: sticky; left: 0; background: var(--surface); z-index: 10;
-  border-right: 2px solid var(--border); border-bottom: 1px solid var(--border);
-  padding: 5px 10px; min-width: 260px; max-width: 260px;
+td.cc {
+  position: sticky; left: 0; background: var(--row-head); z-index: 10;
+  border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 6px 14px; min-width: 280px; max-width: 280px;
+  transition: background .1s;
 }
-td.client-cell a { text-decoration: none; color: var(--text); font-weight: 600; font-size: 12px; }
-td.client-cell a:hover { color: var(--accent); }
-.client-meta { display: flex; gap: 8px; margin-top: 2px; align-items: center; flex-wrap: wrap; }
-.owner-tag { font-size: 10px; color: var(--muted); }
-.due-tag {
-  font-size: 10px; padding: 1px 5px; border-radius: 3px;
-  background: var(--yes25); color: var(--accent-dk); font-weight: 500;
-}
-.due-tag.overdue { background: #fee2e2; color: var(--warn); }
-.mod-badge {
-  font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px;
-  background: var(--accent); color: #fff; margin-left: 4px; vertical-align: middle;
-}
-tr.attention td.client-cell { border-left: 3px solid var(--attn-border); }
-tr:hover td { background: #fffaf7 !important; }
-tr:hover td.client-cell { background: #ffe8d6 !important; }
+tr:hover td.cc { background: #fff7f5; }
+tr:hover td     { background: #fafafa; }
 
-/* Module cells */
-td.mcell {
+td.cc a { text-decoration: none; color: var(--text); font-weight: 600; font-size: 12px; }
+td.cc a:hover { color: var(--accent); text-decoration: underline; }
+
+.cmeta { display: flex; gap: 6px; margin-top: 3px; flex-wrap: wrap; align-items: center; }
+.owner { font-size: 10px; color: var(--muted); }
+.due   { font-size: 10px; padding: 1px 5px; border-radius: 3px;
+         background: #fff7ed; color: #92400e; font-weight: 500;
+         border: 1px solid #fed7aa; }
+.due.ov { background: #fef2f2; color: var(--warn); border-color: #fecaca; }
+.nbadge {
+  display: inline-block; background: var(--accent); color: #fff;
+  border-radius: 10px; font-size: 9px; font-weight: 700; padding: 1px 5px;
+  margin-left: 5px; vertical-align: middle;
+}
+
+/* Attention: clients with few modules */
+tr.attn td.cc { border-left: 3px solid var(--accent); }
+
+/* ── Module cells ── */
+td.mc {
   border-bottom: 1px solid var(--border); border-left: 1px solid #f5ece8;
-  min-width: 40px; max-width: 40px; padding: 0;
-  text-align: center; vertical-align: middle; cursor: default; position: relative;
+  min-width: 32px; max-width: 32px; padding: 5px 4px;
+  text-align: center; vertical-align: middle;
+  position: relative;
 }
-td.mcell.has { cursor: pointer; }
-td.mcell.has:hover::after {
+/* colour dot only — no text in cells */
+.dot {
+  display: inline-block; width: 16px; height: 16px; border-radius: 3px;
+  vertical-align: middle;
+}
+/* tooltip */
+td.mc[data-tip]:hover::after {
   content: attr(data-tip);
-  position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
-  background: #2d0a00; color: #fff8f5; font-size: 10px; padding: 4px 8px;
-  border-radius: 4px; white-space: nowrap; z-index: 100; pointer-events: none;
-  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%);
+  background: var(--col-head); color: #fff8f5; font-size: 10px; padding: 5px 9px;
+  border-radius: 5px; white-space: nowrap; z-index: 200; pointer-events: none;
+  box-shadow: 0 3px 10px rgba(0,0,0,.25); line-height: 1.5;
 }
-td.mcell .cell-inner {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; height: 32px; gap: 2px;
-}
-.cell-pct { font-size: 9px; font-weight: 700; line-height: 1; }
-.cell-bar { width: 24px; height: 3px; border-radius: 2px; background: rgba(0,0,0,.08); overflow: hidden; }
-.cell-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+td.mc.has { cursor: pointer; }
 
-/* Tfoot totals */
+/* Tfoot */
 tfoot { position: sticky; bottom: 0; z-index: 20; }
-tfoot td { border-top: 2px solid var(--border); background: #fdf0e8 !important; }
-tfoot td.client-cell { font-weight: 700; color: var(--muted); font-size: 11px; }
-tfoot td.mcell { font-size: 11px; font-weight: 700; color: var(--accent-dk); }
+tfoot td {
+  border-top: 2px solid var(--border);
+  background: #f8fafc !important;
+  font-size: 11px; font-weight: 700;
+}
+tfoot td.cc  { color: var(--muted); font-size: 11px; }
+tfoot td.mc  { color: var(--accent-dk); text-align: center; }
 
 .loading { text-align: center; padding: 100px 0; color: var(--muted); font-size: 14px; }
 .err { color: var(--warn); }
@@ -167,35 +187,50 @@ tfoot td.mcell { font-size: 11px; font-weight: 700; color: var(--accent-dk); }
 
 <header>
   <img class="logo" src="https://okiedokie-erp-images.s3.ap-south-1.amazonaws.com/Okie%20Dokie/2025/12/sourceURL/26aebcbe10f4ac5a3e8b-611ed1b9032568edd4f3-Okie_Dokie_App_icon__2___2_-removebg-preview.png" alt="OD">
-  <div class="title-block">
+  <div class="tb">
     <h1>Implementation Module Dashboard</h1>
-    <div class="subtitle">Okie Dokie Campus Automation</div>
+    <div class="sub">Okie Dokie Campus Automation</div>
   </div>
   <div class="hstats" id="hstats"></div>
 </header>
 
 <div class="toolbar">
-  <input id="clientQ" placeholder="Search client…" oninput="render()">
-  <input id="modQ"    placeholder="Search module…" oninput="render()">
+  <input id="clientQ" placeholder="🔍 Search client…" oninput="render()">
+  <input id="modQ"    placeholder="🔍 Search module…" oninput="render()">
 
-  <div class="sort-group">
-    <button class="sort-btn active" id="sName" onclick="setSort('name')">Name</button>
-    <button class="sort-btn" id="sCount" onclick="setSort('count')">Modules ↕</button>
-    <button class="sort-btn" id="sDue"   onclick="setSort('due')">Due Date ↕</button>
+  <div class="sep"></div>
+
+  <div class="pill-group">
+    <button class="pill active" id="sName"  onclick="setSort('name')">Name</button>
+    <button class="pill" id="sCount" onclick="setSort('count')">Modules ↕</button>
+    <button class="pill" id="sDue"   onclick="setSort('due')">Due ↕</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="min-filter">
+    Show modules used by ≥
+    <select id="minUse" onchange="render()">
+      <option value="1">1 client</option>
+      <option value="2" selected>2 clients</option>
+      <option value="3">3 clients</option>
+      <option value="5">5 clients</option>
+    </select>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="legend">
+    <span class="li"><span class="swatch" style="background:#e8571a"></span>100%</span>
+    <span class="li"><span class="swatch" style="background:#f4895a"></span>≥75%</span>
+    <span class="li"><span class="swatch" style="background:#f9b899"></span>≥50%</span>
+    <span class="li"><span class="swatch" style="background:#fde0d0"></span>&lt;50%</span>
+    <span class="li"><span class="swatch" style="background:#fff0e8;border-color:#e8d4cb"></span>0 tasks</span>
+    <span class="li"><span class="swatch" style="background:#f5f0ee;border-color:#ddd"></span>–</span>
   </div>
 
   <div class="spacer"></div>
-
-  <div class="legend">
-    <span class="litem"><span class="lswatch" style="background:#e8571a"></span> 100%</span>
-    <span class="litem"><span class="lswatch" style="background:#f4895a"></span> 75%+</span>
-    <span class="litem"><span class="lswatch" style="background:#f9b899"></span> 50%+</span>
-    <span class="litem"><span class="lswatch" style="background:#fde0d0"></span> &lt;50%</span>
-    <span class="litem"><span class="lswatch" style="background:#fff0e8;border-color:#f0d9ce"></span> 0 tasks</span>
-    <span class="litem"><span class="lswatch" style="background:#faf5f2;border-color:#e8d4cb"></span> Not added</span>
-  </div>
-
-  <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+  <button class="export-btn" onclick="exportCSV()">↓ Export CSV</button>
 </div>
 
 <div class="wrap">
@@ -208,51 +243,49 @@ tfoot td.mcell { font-size: 11px; font-weight: 700; color: var(--accent-dk); }
 </div>
 
 <script>
-// ── Module normalisation ────────────────────────────────────────────────────
+// ── Normalisation ────────────────────────────────────────────────────────────
 const MODULE_MAP = {
-  'SIS':            ['sis', 'sis module', 'student information system'],
-  'HRM':            ['hrm'],
-  'HRM & Payroll':  ['hrm & payroll module'],
-  'Fee':            ['fee', 'fee module', 'fees'],
-  'Academic':       ['academic', 'academic module', 'academics', 'academic app'],
-  'Library':        ['library', 'library module'],
-  'Admission':      ['admission', 'admission module'],
-  'Hostel':         ['hostel', 'hostel setup'],
+  'SIS':              ['sis', 'sis module', 'student information system'],
+  'HRM':              ['hrm'],
+  'HRM & Payroll':    ['hrm & payroll module'],
+  'Fee':              ['fee', 'fee module', 'fees'],
+  'Academic':         ['academic', 'academic module', 'academics', 'academic app'],
+  'Library':          ['library', 'library module'],
+  'Admission':        ['admission', 'admission module'],
+  'Hostel':           ['hostel', 'hostel setup'],
   'Hostel & Transport': ['hostel & transport'],
-  'Transport':      ['transport'],
-  'COE':            ['coe', 'coe module'],
-  'Communication':  ['communication', 'communication setup', 'employee communication'],
-  'Front Desk':     ['front desk', 'front desk module'],
-  'Examination':    ['examination', 'report card /examination', 'report card/examination'],
-  'Time Table':     ['time table', 'timetable'],
-  'Payroll':        ['payroll'],
-  'Student App':    ['student app'],
-  'Staff App':      ['staff app'],
-  'Payment Gateway':['payment gateway', 'erp payment'],
-  'PDF Templates':  ['pdf templates', 'pdf/excel templates', 'template pdf/excel',
-                     'templates', 'pdf & excel templates', 'pdf'],
-  'Attendance':     ['attendance'],
-  'Biometric':      ['biometric'],
-  'Zoho Forms':     ['zoho forms', 'zoho form'],
-  'Gatepass':       ['gatepass'],
-  'Integrations':   ['integrations'],
-  'School Diary':   ['school diary'],
-  'SMS/WhatsApp':   ['sms/whatsapp config.', 'sms/whatsapp', 'whatsapp'],
-  'Website':        ['website development & maintenance', 'website'],
-  'Gallery':        ['gallery'],
-  'Student Certs':  ['student certificates', 'student certificate'],
-  'Inventory':      ['inventory module', 'inventory'],
-  'Lesson Plan':    ['lesson plan'],
-  'Class Test':     ['class test'],
-  'Feedback':       ['feedback module'],
-  'Compliance':     ['compliance certificate', 'compliance'],
+  'Transport':        ['transport'],
+  'COE':              ['coe', 'coe module'],
+  'Communication':    ['communication', 'communication setup', 'employee communication'],
+  'Front Desk':       ['front desk', 'front desk module'],
+  'Examination':      ['examination', 'report card /examination', 'report card/examination'],
+  'Time Table':       ['time table', 'timetable'],
+  'Payroll':          ['payroll'],
+  'Student App':      ['student app'],
+  'Staff App':        ['staff app'],
+  'Payment Gateway':  ['payment gateway', 'erp payment'],
+  'PDF Templates':    ['pdf templates', 'pdf/excel templates', 'template pdf/excel',
+                       'templates', 'pdf & excel templates', 'pdf'],
+  'Attendance':       ['attendance'],
+  'Biometric':        ['biometric'],
+  'Zoho Forms':       ['zoho forms', 'zoho form'],
+  'Gatepass':         ['gatepass'],
+  'Integrations':     ['integrations'],
+  'School Diary':     ['school diary'],
+  'SMS/WhatsApp':     ['sms/whatsapp config.', 'sms/whatsapp', 'whatsapp'],
+  'Website':          ['website development & maintenance', 'website'],
+  'Gallery':          ['gallery'],
+  'Student Certs':    ['student certificates', 'student certificate'],
+  'Inventory':        ['inventory module', 'inventory'],
+  'Lesson Plan':      ['lesson plan'],
+  'Class Test':       ['class test'],
+  'Feedback':         ['feedback module'],
+  'Compliance':       ['compliance certificate', 'compliance'],
 };
+const ALIAS = {};
+for (const [m, aa] of Object.entries(MODULE_MAP)) for (const a of aa) ALIAS[a] = m;
 
-const ALIAS_TO_MOD = {};
-for (const [mod, aliases] of Object.entries(MODULE_MAP))
-  for (const a of aliases) ALIAS_TO_MOD[a] = mod;
-
-const ADMIN_SKIP = new Set([
+const SKIP = new Set([
   'getting started','modulewise implementation status','issues & requirements',
   'issues/requirements','visits','visit','module handover done','untitled section',
   'project status','implementation','daily queries','client queries',
@@ -265,238 +298,208 @@ const ADMIN_SKIP = new Set([
   'aggarwal law college - fee module','aggarwal law college - hrm module',
 ]);
 
-function canonicalModule(rawName) {
-  const key = rawName.trim().toLowerCase();
-  if (ADMIN_SKIP.has(key)) return null;
-  return ALIAS_TO_MOD[key] || rawName.trim();
+function canon(raw) {
+  const k = raw.trim().toLowerCase();
+  return SKIP.has(k) ? null : (ALIAS[k] || raw.trim());
 }
 
-// ── State ───────────────────────────────────────────────────────────────────
-let RAW = [];          // original API response
-let ALL_MODS = [];     // sorted canonical module names
-let SORT = 'name';
-let SORT_DIR = 1;      // 1 = asc, -1 = desc
+// ── State ────────────────────────────────────────────────────────────────────
+let RAW = [], ALL_MODS = [], SORT = 'name', SORT_DIR = 1;
+const today = new Date().toISOString().slice(0, 10);
 
-// Build enriched client list: resolve sections → canonical modules with counts
-function buildClients(rawClients) {
-  return rawClients.map(c => {
-    const modMap = {};   // canonical name → {gid, total, complete}
+function buildClients(raw) {
+  return raw.map(c => {
+    const mods = {};
     for (const s of c.sections) {
-      const canon = canonicalModule(s.name);
-      if (!canon) continue;
-      // If the same canonical appears twice (e.g. HRM and HRM & Payroll both
-      // map to different canonicals now, but just in case), keep the higher count.
-      if (!modMap[canon] || s.total > modMap[canon].total) {
-        modMap[canon] = { gid: s.gid, total: s.total, complete: s.complete };
-      }
+      const m = canon(s.name);
+      if (!m) continue;
+      if (!mods[m] || s.total > mods[m].total)
+        mods[m] = { gid: s.gid, total: s.total, complete: s.complete };
     }
-    return {
-      name:   c.name,
-      gid:    c.gid,
-      due_on: c.due_on,
-      owner:  c.owner,
-      mods:   modMap,
-      count:  Object.keys(modMap).length,
-    };
+    return { name: c.name, gid: c.gid, due_on: c.due_on, owner: c.owner,
+             mods, count: Object.keys(mods).length };
   });
 }
 
-function computeAllMods(clients) {
+function allMods(clients) {
   const freq = {};
-  for (const c of clients)
-    for (const m of Object.keys(c.mods))
-      freq[m] = (freq[m] || 0) + 1;
-  return Object.keys(freq).sort((a, b) => freq[b] - freq[a] || a.localeCompare(b));
+  for (const c of clients) for (const m of Object.keys(c.mods)) freq[m] = (freq[m]||0)+1;
+  return Object.keys(freq).sort((a,b) => freq[b]-freq[a] || a.localeCompare(b));
 }
 
-// ── Sorting ──────────────────────────────────────────────────────────────────
-function setSort(key) {
-  if (SORT === key) { SORT_DIR *= -1; }
-  else { SORT = key; SORT_DIR = key === 'count' ? -1 : 1; }
-  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('s' + key.charAt(0).toUpperCase() + key.slice(1)).classList.add('active');
+function setSort(k) {
+  SORT_DIR = SORT === k ? -SORT_DIR : (k === 'count' ? -1 : 1);
+  SORT = k;
+  document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+  document.getElementById('s'+k[0].toUpperCase()+k.slice(1)).classList.add('active');
   render();
 }
 
-function sortedClients(clients) {
-  return [...clients].sort((a, b) => {
+function sorted(clients) {
+  return [...clients].sort((a,b) => {
     let v = 0;
-    if (SORT === 'name')  v = a.name.localeCompare(b.name);
-    if (SORT === 'count') v = b.count - a.count;
-    if (SORT === 'due') {
-      const da = a.due_on || '9999', db = b.due_on || '9999';
-      v = da < db ? -1 : da > db ? 1 : 0;
-    }
+    if (SORT==='name')  v = a.name.localeCompare(b.name);
+    if (SORT==='count') v = b.count - a.count;
+    if (SORT==='due')   v = (a.due_on||'9999') < (b.due_on||'9999') ? -1 : 1;
     return v * SORT_DIR;
   });
 }
 
-// ── Cell helpers ─────────────────────────────────────────────────────────────
-const today = new Date().toISOString().slice(0, 10);
-
-function cellBg(total, complete) {
-  if (total === 0)  return 'var(--yes0)';
-  const pct = complete / total;
-  if (pct >= 1)    return 'var(--yes100)';
-  if (pct >= 0.75) return 'var(--yes75)';
-  if (pct >= 0.5)  return 'var(--yes50)';
-  return 'var(--yes25)';
+// Cell colour based on completion %
+function dotColor(total, complete) {
+  if (total === 0)              return '#fff0e8';   // added, no tasks
+  const p = complete / total;
+  if (p >= 1)    return '#e8571a';
+  if (p >= 0.75) return '#f4895a';
+  if (p >= 0.5)  return '#f9b899';
+  return '#fde0d0';
 }
-function cellFg(total, complete) {
-  if (total === 0) return 'var(--accent)';
-  return complete / total >= 0.5 ? '#fff' : 'var(--accent-dk)';
+function dotBorder(total, complete) {
+  if (total === 0) return '#f4b49a';
+  const p = complete / total;
+  return p >= 0.5 ? 'rgba(0,0,0,.12)' : '#f4a87a';
 }
 
-// ── Render ───────────────────────────────────────────────────────────────────
+// ── Render ────────────────────────────────────────────────────────────────────
 function render() {
-  const clientQ = document.getElementById('clientQ').value.toLowerCase();
-  const modQ    = document.getElementById('modQ').value.toLowerCase();
+  const cQ   = document.getElementById('clientQ').value.toLowerCase();
+  const mQ   = document.getElementById('modQ').value.toLowerCase();
+  const minU = parseInt(document.getElementById('minUse').value, 10);
 
   const clients = buildClients(RAW);
-  const visMods = ALL_MODS.filter(m => m.toLowerCase().includes(modQ));
-  const visClients = sortedClients(
-    clients.filter(c => c.name.toLowerCase().includes(clientQ))
-  );
+  const modFreq = {};
+  for (const c of clients) for (const m of Object.keys(c.mods)) modFreq[m]=(modFreq[m]||0)+1;
 
-  // ── thead ──
+  const visMods = ALL_MODS.filter(m =>
+    m.toLowerCase().includes(mQ) && (modFreq[m]||0) >= minU
+  );
+  const visClients = sorted(clients.filter(c => c.name.toLowerCase().includes(cQ)));
+
+  // thead
   const thead = document.getElementById('thead');
   thead.innerHTML = '';
   const hr = document.createElement('tr');
   const corner = document.createElement('th');
   corner.className = 'corner';
-  corner.innerHTML = 'Client &nbsp;·&nbsp; Owner &nbsp;·&nbsp; Due';
+  corner.textContent = 'Client · Owner · Due';
   hr.appendChild(corner);
 
-  // Pre-compute per-module counts for header sub-label
-  const modCounts = {};
+  const modUsage = {};
   for (const m of visMods) {
-    modCounts[m] = visClients.filter(c => c.mods[m]).length;
-  }
-
-  for (const m of visMods) {
+    modUsage[m] = visClients.filter(c => c.mods[m]).length;
     const th = document.createElement('th');
-    th.className = 'mod-head';
-    th.title = `${m} — used by ${modCounts[m]} clients`;
-    th.innerHTML = `<div>${m}<span class="mod-total">${modCounts[m]} clients</span></div>`;
+    th.className = 'mh';
+    th.title = `${m} — ${modUsage[m]} clients`;
+    th.innerHTML = `<div class="rot">${m}<span class="cnt">${modUsage[m]}</span></div>`;
     hr.appendChild(th);
   }
   thead.appendChild(hr);
 
-  // ── tbody ──
+  // tbody
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
-  const modUsage = {};
-  for (const m of visMods) modUsage[m] = 0;
+  const totals = {};
+  for (const m of visMods) totals[m] = 0;
 
   for (const c of visClients) {
     const visCount = visMods.filter(m => c.mods[m]).length;
     const tr = document.createElement('tr');
-    if (c.count < 3) tr.classList.add('attention');
+    if (c.count < 3) tr.classList.add('attn');
 
     // Client cell
     const tc = document.createElement('td');
-    tc.className = 'client-cell';
-    const asanaUrl = `https://app.asana.com/0/${c.gid}/list`;
-    let metaHtml = '';
-    if (c.owner) metaHtml += `<span class="owner-tag">👤 ${c.owner}</span>`;
+    tc.className = 'cc';
+    const url = `https://app.asana.com/0/${c.gid}/list`;
+    let meta = '';
+    if (c.owner) meta += `<span class="owner">👤 ${c.owner}</span>`;
     if (c.due_on) {
-      const overdue = c.due_on < today;
-      metaHtml += `<span class="due-tag${overdue ? ' overdue' : ''}">${overdue ? '⚠ ' : ''}${c.due_on}</span>`;
+      const ov = c.due_on < today;
+      meta += `<span class="due${ov?' ov':''}">${ov?'⚠ ':''}${c.due_on}</span>`;
     }
     tc.innerHTML =
-      `<a href="${asanaUrl}" target="_blank" rel="noopener">${c.name}</a>` +
-      `<span class="mod-badge">${visCount}</span>` +
-      (metaHtml ? `<div class="client-meta">${metaHtml}</div>` : '');
+      `<a href="${url}" target="_blank" rel="noopener">${c.name}</a>` +
+      `<span class="nbadge">${visCount}</span>` +
+      (meta ? `<div class="cmeta">${meta}</div>` : '');
     tr.appendChild(tc);
 
     // Module cells
     for (const m of visMods) {
       const td = document.createElement('td');
-      td.className = 'mcell';
+      td.className = 'mc';
       const info = c.mods[m];
       if (info) {
         td.classList.add('has');
-        const bg = cellBg(info.total, info.complete);
-        const fg = cellFg(info.total, info.complete);
-        td.style.background = bg;
-        const pct = info.total > 0 ? Math.round(info.complete / info.total * 100) : null;
+        const pct = info.total > 0 ? Math.round(info.complete/info.total*100) : null;
         const tip = info.total > 0
-          ? `${m}: ${info.complete}/${info.total} tasks (${pct}%)`
-          : `${m}: section added, no tasks yet`;
+          ? `${m}\n${info.complete}/${info.total} tasks · ${pct}%`
+          : `${m}\nSection added · no tasks yet`;
         td.setAttribute('data-tip', tip);
-        const sectionUrl = `https://app.asana.com/0/${c.gid}/list`;
-        td.onclick = () => window.open(sectionUrl, '_blank');
-        td.innerHTML = `<div class="cell-inner">` +
-          (info.total > 0
-            ? `<span class="cell-pct" style="color:${fg}">${pct}%</span>
-               <div class="cell-bar"><div class="cell-fill" style="width:${pct}%;background:${fg}"></div></div>`
-            : `<span style="font-size:13px;color:var(--accent)">·</span>`) +
-          `</div>`;
-        modUsage[m]++;
+        td.style.background = '#fffaf7';
+        const color  = dotColor(info.total, info.complete);
+        const border = dotBorder(info.total, info.complete);
+        td.innerHTML = `<span class="dot" style="background:${color};border:1px solid ${border}"></span>`;
+        td.onclick = () => window.open(url, '_blank');
+        totals[m]++;
       } else {
-        td.style.background = 'var(--no-bg)';
-        td.innerHTML = `<div class="cell-inner"><span style="font-size:11px;color:var(--no-fg)">–</span></div>`;
+        td.innerHTML = `<span style="color:#ddd;font-size:11px">–</span>`;
       }
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
   }
 
-  // ── tfoot ──
+  // tfoot
   const tfoot = document.getElementById('tfoot');
   tfoot.innerHTML = '';
-  const tr2 = document.createElement('tr');
-  const tf0 = document.createElement('td');
-  tf0.className = 'client-cell';
-  tf0.textContent = `Clients using module (${visClients.length} shown)`;
-  tr2.appendChild(tf0);
+  const tf = document.createElement('tr');
+  const tfc = document.createElement('td');
+  tfc.className = 'cc';
+  tfc.textContent = `Clients using module  (${visClients.length} shown)`;
+  tf.appendChild(tfc);
   for (const m of visMods) {
     const td = document.createElement('td');
-    td.className = 'mcell';
-    td.textContent = modUsage[m];
-    tr2.appendChild(td);
+    td.className = 'mc';
+    td.textContent = totals[m];
+    tf.appendChild(td);
   }
-  tfoot.appendChild(tr2);
+  tfoot.appendChild(tf);
 
   document.getElementById('hstats').innerHTML =
     `<span>${visClients.length} <b>clients</b></span><span>${visMods.length} <b>modules</b></span>`;
 }
 
-// ── Export CSV ───────────────────────────────────────────────────────────────
+// ── Export ────────────────────────────────────────────────────────────────────
 function exportCSV() {
-  const clientQ = document.getElementById('clientQ').value.toLowerCase();
-  const modQ    = document.getElementById('modQ').value.toLowerCase();
-  const clients = sortedClients(
-    buildClients(RAW).filter(c => c.name.toLowerCase().includes(clientQ))
-  );
-  const mods = ALL_MODS.filter(m => m.toLowerCase().includes(modQ));
-
-  const esc = v => `"${String(v).replace(/"/g, '""')}"`;
-  const rows = [['Client', 'Owner', 'Due Date', 'Modules Count', ...mods].map(esc).join(',')];
-  for (const c of clients) {
-    rows.push([
-      c.name, c.owner || '', c.due_on || '', c.count,
+  const cQ   = document.getElementById('clientQ').value.toLowerCase();
+  const mQ   = document.getElementById('modQ').value.toLowerCase();
+  const minU = parseInt(document.getElementById('minUse').value, 10);
+  const clients = buildClients(RAW);
+  const modFreq = {};
+  for (const c of clients) for (const m of Object.keys(c.mods)) modFreq[m]=(modFreq[m]||0)+1;
+  const mods = ALL_MODS.filter(m => m.toLowerCase().includes(mQ) && (modFreq[m]||0) >= minU);
+  const vis  = sorted(clients.filter(c => c.name.toLowerCase().includes(cQ)));
+  const e = v => `"${String(v??'').replace(/"/g,'""')}"`;
+  const rows = [['Client','Owner','Due Date','Module Count',...mods].map(e).join(',')];
+  for (const c of vis) {
+    rows.push([c.name,c.owner||'',c.due_on||'',c.count,
       ...mods.map(m => {
-        const info = c.mods[m];
-        if (!info) return '';
-        return info.total > 0 ? `${info.complete}/${info.total}` : 'added';
-      })
-    ].map(esc).join(','));
+        const i = c.mods[m];
+        return !i ? '' : i.total > 0 ? `${i.complete}/${i.total}` : 'added';
+      })].map(e).join(','));
   }
-  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `implementation-modules-${today}.csv`;
+  a.href = URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));
+  a.download = `impl-modules-${today}.csv`;
   a.click();
 }
 
-// ── Boot ─────────────────────────────────────────────────────────────────────
+// ── Boot ──────────────────────────────────────────────────────────────────────
 fetch('/api/modules')
   .then(r => r.json())
   .then(d => {
     if (!d.ok) throw new Error(d.error);
     RAW = d.clients;
-    ALL_MODS = computeAllMods(buildClients(RAW));
+    ALL_MODS = allMods(buildClients(RAW));
     document.getElementById('loading').style.display = 'none';
     document.getElementById('grid').style.display = '';
     render();
