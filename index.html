@@ -99,7 +99,7 @@ thead { position: sticky; top: 0; z-index: 20; }
 th.corner {
   position: sticky; left: 0; z-index: 25;
   background: var(--col-head); width: 320px; padding: 6px 14px;
-  font-size: 10px; color: var(--col-sub); text-align: left;
+  font-size: 13px; font-weight: 600; color: #ffffff; text-align: left;
   border-right: 1px solid rgba(255,255,255,.1);
 }
 
@@ -382,7 +382,7 @@ function render() {
   const hr = document.createElement('tr');
   const corner = document.createElement('th');
   corner.className = 'corner';
-  corner.textContent = 'Client · Owner · Due';
+  corner.textContent = 'Client · Owner';
   hr.appendChild(corner);
 
   const modUsage = {};
