@@ -228,7 +228,7 @@ tfoot td.mc  { color: var(--accent-dk); text-align: center; }
 // ── Normalisation ────────────────────────────────────────────────────────────
 const MODULE_MAP = {
   'SIS':              ['sis', 'sis module', 'student information system'],
-  'HRM':              ['hrm'],
+  'HRM':              ['hrm', 'hr', 'hr module', 'hrm module', 'human resource', 'human resources'],
   'HRM & Payroll':    ['hrm & payroll module'],
   'Fee':              ['fee', 'fee module', 'fees'],
   'Academic':         ['academic', 'academic module', 'academics', 'academic app'],
@@ -238,7 +238,7 @@ const MODULE_MAP = {
   'Hostel & Transport': ['hostel & transport'],
   'Transport':        ['transport'],
   'COE':              ['coe', 'coe module'],
-  'Communication':    ['communication', 'communication setup', 'employee communication'],
+  'Communication':    ['communication', 'communication module', 'communication setup', 'employee communication'],
   'Front Desk':       ['front desk', 'front desk module'],
   'Examination':      ['examination', 'report card /examination', 'report card/examination'],
   'Time Table':       ['time table', 'timetable'],
@@ -276,13 +276,15 @@ const SKIP = new Set([
   'client calls for initiating setup','online meeting','module observation',
   'training','tranings','permission group','whtasapp','email set up',
   'requirement for development','landing page','session setup','setup on erp',
-  'advanced module','student query','task','saraswati law college',
+  'advanced module','student query','task','institute setup','saraswati law college',
   'aggarwal law college - fee module','aggarwal law college - hrm module',
 ]);
 
 function canon(raw) {
-  const k = raw.trim().toLowerCase();
-  return SKIP.has(k) ? null : (ALIAS[k] || raw.trim());
+  const full     = raw.trim().toLowerCase();
+  const stripped = full.replace(/\s+module$/, '');
+  if (SKIP.has(full) || SKIP.has(stripped)) return null;
+  return ALIAS[full] || ALIAS[stripped] || raw.trim();
 }
 
 // ── State ────────────────────────────────────────────────────────────────────
