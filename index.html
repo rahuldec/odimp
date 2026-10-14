@@ -150,8 +150,9 @@ td.mc {
 }
 /* colour dot only — no text in cells */
 .dot {
-  display: inline-block; width: 20px; height: 20px; border-radius: 4px;
-  vertical-align: middle;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 28px; border-radius: 5px;
+  font-size: 10px; font-weight: 700; line-height: 1;
 }
 /* tooltip */
 td.mc[data-tip]:hover::after {
@@ -412,7 +413,10 @@ function render() {
         td.style.background = '#fffaf7';
         const color  = dotColor(info.total, info.complete);
         const border = dotBorder(info.total, info.complete);
-        td.innerHTML = `<span class="dot" style="background:${color};border:1px solid ${border}"></span>`;
+        const fg = info.total === 0 ? '#c44213'
+                 : (info.complete / info.total) >= 0.5 ? '#fff' : '#7c2d12';
+        const label = info.total === 0 ? '·' : `${pct}%`;
+        td.innerHTML = `<span class="dot" style="background:${color};border:1px solid ${border};color:${fg}">${label}</span>`;
         td.onclick = () => window.open(url, '_blank');
         totals[m]++;
       } else {
