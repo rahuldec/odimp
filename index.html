@@ -229,7 +229,7 @@ tfoot td.mc  { color: var(--accent-dk); text-align: center; }
 const MODULE_MAP = {
   'SIS':              ['sis', 'sis module', 'student information system'],
   'HRM':              ['hrm', 'hr', 'hr module', 'hrm module', 'human resource', 'human resources'],
-  'HRM & Payroll':    ['hrm & payroll module'],
+  'HRM & Payroll':    ['hrm & payroll module', 'hrm & payroll', 'hr & payroll'],
   'Fee':              ['fee', 'fee module', 'fees'],
   'Academic':         ['academic', 'academic module', 'academics', 'academic app'],
   'Library':          ['library', 'library module'],
@@ -243,11 +243,12 @@ const MODULE_MAP = {
   'Examination':      ['examination', 'report card /examination', 'report card/examination'],
   'Time Table':       ['time table', 'timetable'],
   'Payroll':          ['payroll'],
-  'Student App':      ['student app'],
+  'Student App':      ['student app', 'student preferences setup', 'student prefrences setup',
+                       'student portal', 'student self service portal', 'student application'],
   'Staff App':        ['staff app'],
-  'Payment Gateway':  ['payment gateway', 'erp payment'],
-  'PDF Templates':    ['pdf templates', 'pdf/excel templates', 'template pdf/excel',
-                       'templates', 'pdf & excel templates', 'pdf'],
+  'Payment Gateway':  ['payment gateway', 'erp payment', 'payment'],
+  'PDF Templates':    ['pdf templates', 'pdf/excel templates', 'pdf/excel template',
+                       'template pdf/excel', 'templates', 'pdf & excel templates', 'pdf'],
   'Attendance':       ['attendance'],
   'Biometric':        ['biometric'],
   'Zoho Forms':       ['zoho forms', 'zoho form'],
@@ -268,16 +269,26 @@ const ALIAS = {};
 for (const [m, aa] of Object.entries(MODULE_MAP)) for (const a of aa) ALIAS[a] = m;
 
 const SKIP = new Set([
-  'getting started','modulewise implementation status','issues & requirements',
+  // Admin / process sections
+  'getting started','get started','modulewise implementation status','issues & requirements',
   'issues/requirements','visits','visit','module handover done','untitled section',
   'project status','implementation','daily queries','client queries',
   'customer onboarding','escalations','payment recovery','handover',
   'things to be covered during training','review','daily meeting (online)',
   'client calls for initiating setup','online meeting','module observation',
-  'training','tranings','permission group','whtasapp','email set up',
-  'requirement for development','landing page','session setup','setup on erp',
-  'advanced module','student query','task','institute setup','saraswati law college',
-  'aggarwal law college - fee module','aggarwal law college - hrm module',
+  'training','tranings','permission group','permission update','permissions update',
+  'whtasapp','email set up','requirement for development','landing page',
+  'session setup','setup on erp','advanced module','student query','task',
+  'institute setup','data import','excel template create',
+  'admission form pdf template creation','admission set up done with 0',
+  'application form','fee module pending due to the client','fee receipt design',
+  'hrm leave group setup','library data add','pg','hr payroll',
+  // Project/client names mistakenly used as sections
+  'saraswati law college','aggarwal law college - fee module',
+  'aggarwal law college - hrm module','hindu college of engineering',
+  // Dalmia-specific admin sections
+  'dalmia all entities permission groups creation and excel templates update',
+  'vendor update hindu','subjects data import- after tuesday','bpharmacy',
 ]);
 
 function canon(raw) {
