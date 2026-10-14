@@ -91,21 +91,21 @@ header .sub { font-size: 10px; color: var(--gold); text-transform: uppercase; le
 /* ── Table wrap ── */
 .wrap { overflow: auto; height: calc(100vh - 106px); }
 
-table { border-collapse: collapse; white-space: nowrap; }
+table { border-collapse: collapse; white-space: nowrap; min-width: 100%; }
 
 /* Column header row */
 thead { position: sticky; top: 0; z-index: 20; }
 
 th.corner {
   position: sticky; left: 0; z-index: 25;
-  background: var(--col-head); min-width: 280px; padding: 6px 14px;
+  background: var(--col-head); width: 320px; padding: 6px 14px;
   font-size: 10px; color: var(--col-sub); text-align: left;
   border-right: 1px solid #1e293b;
 }
 
 th.mh {
   background: var(--col-head);
-  padding: 0; min-width: 32px; max-width: 32px; height: 120px;
+  padding: 0; width: 52px; min-width: 52px; height: 120px;
   vertical-align: bottom; border-left: 1px solid #1e293b; cursor: default;
 }
 th.mh div.rot {
@@ -123,7 +123,8 @@ th.mh div.rot span.cnt {
 td.cc {
   position: sticky; left: 0; background: var(--row-head); z-index: 10;
   border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
-  padding: 6px 14px; min-width: 280px; max-width: 280px;
+  padding: 6px 14px; width: 320px; min-width: 320px;
+  white-space: normal; word-break: break-word;
   transition: background .1s;
 }
 tr:hover td.cc { background: #fff7f5; }
@@ -150,13 +151,13 @@ tr.attn td.cc { border-left: 3px solid var(--accent); }
 /* ── Module cells ── */
 td.mc {
   border-bottom: 1px solid var(--border); border-left: 1px solid #f5ece8;
-  min-width: 32px; max-width: 32px; padding: 5px 4px;
+  width: 52px; min-width: 52px; padding: 6px 4px;
   text-align: center; vertical-align: middle;
   position: relative;
 }
 /* colour dot only — no text in cells */
 .dot {
-  display: inline-block; width: 16px; height: 16px; border-radius: 3px;
+  display: inline-block; width: 20px; height: 20px; border-radius: 4px;
   vertical-align: middle;
 }
 /* tooltip */
