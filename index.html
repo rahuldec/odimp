@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Implementation Module Dashboard</title>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #1a202c;
+    --text-muted: #718096;
+    --accent: #4f46e5;
+    --yes-bg: #d1fae5;
+    --yes-fg: #065f46;
+    --no-bg: #f1f5f9;
+    --no-fg: #94a3b8;
+    --header-bg: #1e293b;
+    --header-fg: #f8fafc;
+    --shadow: 0 1px 3px rgba(0,0,0,.08);
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 13px; }
+
+  header { background: var(--header-bg); color: var(--header-fg); padding: 16px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 18px; font-weight: 600; flex: 1; }
+  .stats { display: flex; gap: 20px; font-size: 12px; color: #94a3b8; }
+  .stats span b { color: #e2e8f0; }
+
+  .toolbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .toolbar input { border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 12px; width: 220px; outline: none; }
+  .toolbar input:focus { border-color: var(--accent); }
+  .legend { display: flex; gap: 12px; margin-left: auto; font-size: 11px; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .dot-yes { background: var(--yes-bg); border: 1px solid #6ee7b7; }
+  .dot-no  { background: var(--no-bg);  border: 1px solid var(--border); }
+
+  .wrap { overflow: auto; max-height: calc(100vh - 120px); }
+
+  table { border-collapse: collapse; white-space: nowrap; }
+  thead { position: sticky; top: 0; z-index: 10; }
+  th.corner { position: sticky; left: 0; z-index: 20; background: var(--header-bg); min-width: 220px; padding: 8px 12px; font-size: 11px; color: #64748b; text-align: left; }
+  th.mod-head {
+    background: var(--header-bg); color: var(--header-fg);
+    padding: 0; min-width: 38px; max-width: 38px; height: 130px; vertical-align: bottom;
+    border-left: 1px solid #334155;
+  }
+  th.mod-head div {
+    transform: rotate(-60deg) translateX(-8px);
+    transform-origin: bottom left;
+    white-space: nowrap; font-size: 11px; font-weight: 500;
+    padding-bottom: 4px; color: #e2e8f0;
+    width: 130px;
+  }
+
+  td.client-name {
+    position: sticky; left: 0; background: var(--surface);
+    border-right: 2px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 6px 12px; font-weight: 500; min-width: 220px; max-width: 220px;
+    overflow: hidden; text-overflow: ellipsis; z-index: 5;
+    cursor: default;
+  }
+  td.client-name:hover { background: #f0f9ff; }
+  tr:hover td { background: #fafbff; }
+  tr:hover td.client-name { background: #e0f2fe; }
+
+  td.cell {
+    text-align: center; border-bottom: 1px solid var(--border);
+    border-left: 1px solid #f1f5f9;
+    min-width: 38px; padding: 4px 2px;
+  }
+  td.cell.yes { background: var(--yes-bg); }
+  td.cell.no  { background: var(--no-bg); color: var(--no-fg); }
+  .tick { font-size: 14px; line-height: 1; }
+
+  .loading { text-align: center; padding: 80px 0; color: var(--text-muted); font-size: 14px; }
+  .err { color: #dc2626; }
+
+  .count-badge {
+    display: inline-block; background: var(--accent); color: #fff;
+    border-radius: 10px; font-size: 10px; padding: 1px 6px; margin-left: 6px;
+    vertical-align: middle;
+  }
+  .mod-count { font-size: 10px; color: #64748b; display: block; margin-top: 2px; }
+
+  .hidden { display: none !important; }
+  tfoot tr td { position: sticky; bottom: 0; border-top: 2px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Implementation Module Dashboard</h1>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div class="toolbar">
+  <input type="text" id="clientFilter" placeholder="Search client…" oninput="applyFilters()">
+  <input type="text" id="moduleFilter" placeholder="Search module…" oninput="applyFilters()">
+  <div class="legend">
+    <span><i class="dot dot-yes"></i> Module active</span>
+    <span><i class="dot dot-no"></i> Not implemented</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="loading" id="loading">Loading data from Asana…</div>
+  <table id="grid" style="display:none">
+    <thead id="thead"></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+// ── Module normalisation ────────────────────────────────────────────────────
+// Maps canonical module name → array of section name patterns (lowercase,
+// trimmed). A section that matches any alias gets bucketed under the canonical
+// name. A section that matches nothing AND isn't in ADMIN_SKIP is shown as-is.
+
+const MODULE_MAP = {
+  'SIS':              ['sis', 'sis module', 'student information system'],
+  'HRM':              ['hrm'],
+  'Fee':              ['fee', 'fee module', 'fees'],
+  'Academic':         ['academic', 'academic module', 'academics', 'academic app'],
+  'Library':          ['library', 'library module'],
+  'Admission':        ['admission', 'admission module'],
+  'Hostel':           ['hostel', 'hostel setup'],
+  'Transport':        ['transport'],
+  'COE':              ['coe', 'coe module'],
+  'Communication':    ['communication', 'communication setup', 'employee communication'],
+  'Front Desk':       ['front desk', 'front desk module'],
+  'Examination':      ['examination', 'report card /examination', 'report card/examination'],
+  'Time Table':       ['time table', 'timetable'],
+  'Payroll':          ['payroll'],
+  'HRM & Payroll':    ['hrm & payroll module'],
+  'Student App':      ['student app'],
+  'Staff App':        ['staff app'],
+  'Payment Gateway':  ['payment gateway', 'erp payment'],
+  'PDF Templates':    ['pdf templates', 'pdf/excel templates', 'template pdf/excel',
+                       'templates', 'pdf & excel templates', 'pdf'],
+  'Attendance':       ['attendance'],
+  'Biometric':        ['biometric'],
+  'Zoho Forms':       ['zoho forms', 'zoho form'],
+  'Gatepass':         ['gatepass'],
+  'Integrations':     ['integrations'],
+  'School Diary':     ['school diary'],
+  'SMS/WhatsApp':     ['sms/whatsapp config.', 'sms/whatsapp', 'whatsapp'],
+  'Website':          ['website development & maintenance', 'website'],
+  'Gallery':          ['gallery'],
+  'Student Cert.':    ['student certificates', 'student certificate'],
+  'Inventory':        ['inventory module', 'inventory'],
+  'Lesson Plan':      ['lesson plan'],
+  'Class Test':       ['class test'],
+  'Hostel & Transport': ['hostel & transport'],
+  'Feedback':         ['feedback module'],
+  'Compliance':       ['compliance certificate', 'compliance'],
+};
+
+// Build reverse lookup: alias → canonical
+const ALIAS_TO_MODULE = {};
+for (const [mod, aliases] of Object.entries(MODULE_MAP)) {
+  for (const a of aliases) ALIAS_TO_MODULE[a] = mod;
+}
+
+// Sections that are administrative / structural — not ERP modules
+const ADMIN_SKIP = new Set([
+  'getting started','modulewise implementation status','issues & requirements',
+  'issues/requirements','visits','visit','module handover done','untitled section',
+  'project status','implementation','daily queries','client queries',
+  'customer onboarding','escalations','payment recovery','handover',
+  'things to be covered during training','review','daily meeting (online)',
+  'client calls for initiating setup','online meeting','module observation',
+  'training','tranings','permission group','whtasapp','email set up',
+  'requirement for development','landing page','session setup','setup on erp',
+  'advanced module','student query','task','saraswati law college',
+  'aggarwal law college - fee module','aggarwal law college - hrm module',
+]);
+
+function normalizeSection(raw) {
+  const key = raw.trim().toLowerCase();
+  if (ADMIN_SKIP.has(key)) return null;
+  return ALIAS_TO_MODULE[key] || raw.trim();
+}
+
+// ── Render ──────────────────────────────────────────────────────────────────
+let ALL_MODULES = [];
+let CLIENTS = [];
+
+function buildGrid(clients) {
+  // Collect all canonical module names across all clients
+  const modSet = new Set();
+  const clientModules = clients.map(c => {
+    const mods = new Set();
+    for (const s of c.sections) {
+      const n = normalizeSection(s);
+      if (n) { mods.add(n); modSet.add(n); }
+    }
+    return { name: c.name, mods };
+  });
+
+  // Sort modules by how many clients use them (desc), then alpha
+  ALL_MODULES = [...modSet].sort((a, b) => {
+    const ca = clientModules.filter(c => c.mods.has(a)).length;
+    const cb = clientModules.filter(c => c.mods.has(b)).length;
+    return cb - ca || a.localeCompare(b);
+  });
+
+  CLIENTS = clientModules;
+
+  renderTable();
+  document.getElementById('stats').innerHTML =
+    `<span>${clients.length} <b>clients</b></span>` +
+    `<span>${ALL_MODULES.length} <b>modules</b></span>`;
+}
+
+function renderTable() {
+  const clientQ = document.getElementById('clientFilter').value.toLowerCase();
+  const modQ    = document.getElementById('moduleFilter').value.toLowerCase();
+
+  const visibleMods = ALL_MODULES.filter(m => m.toLowerCase().includes(modQ));
+
+  // Module counts for filtered view
+  const modCount = {};
+  for (const m of visibleMods) modCount[m] = 0;
+
+  // Head
+  const thead = document.getElementById('thead');
+  thead.innerHTML = '';
+  const hr = document.createElement('tr');
+  const corner = document.createElement('th');
+  corner.className = 'corner';
+  corner.textContent = 'Client';
+  hr.appendChild(corner);
+  for (const m of visibleMods) {
+    const th = document.createElement('th');
+    th.className = 'mod-head';
+    const div = document.createElement('div');
+    div.textContent = m;
+    th.appendChild(div);
+    hr.appendChild(th);
+  }
+  thead.appendChild(hr);
+
+  // Body
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  for (const c of CLIENTS) {
+    if (!c.name.toLowerCase().includes(clientQ)) continue;
+    const tr = document.createElement('tr');
+    const td0 = document.createElement('td');
+    td0.className = 'client-name';
+    td0.title = c.name;
+    const count = visibleMods.filter(m => c.mods.has(m)).length;
+    td0.innerHTML = c.name + `<span class="count-badge">${count}</span>`;
+    tr.appendChild(td0);
+
+    for (const m of visibleMods) {
+      const td = document.createElement('td');
+      const has = c.mods.has(m);
+      td.className = 'cell ' + (has ? 'yes' : 'no');
+      td.innerHTML = has ? '<span class="tick">✓</span>' : '<span class="tick" style="opacity:.3">–</span>';
+      td.title = has ? `${c.name} → ${m} ✓` : `${c.name} → ${m} not implemented`;
+      if (has) modCount[m]++;
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+
+  // Totals row
+  const tfoot = document.getElementById('tfoot') || (() => {
+    const el = document.createElement('tfoot');
+    el.id = 'tfoot';
+    document.getElementById('grid').appendChild(el);
+    return el;
+  })();
+  tfoot.innerHTML = '';
+  const tr2 = document.createElement('tr');
+  const td0f = document.createElement('td');
+  td0f.className = 'client-name';
+  td0f.style.fontWeight = '600';
+  td0f.style.color = '#64748b';
+  td0f.textContent = 'Total clients using';
+  tr2.appendChild(td0f);
+  for (const m of visibleMods) {
+    const td = document.createElement('td');
+    td.className = 'cell';
+    td.style.background = '#f8fafc';
+    td.style.fontWeight = '600';
+    td.style.fontSize = '11px';
+    td.style.color = '#475569';
+    td.textContent = modCount[m] || 0;
+    tr2.appendChild(td);
+  }
+  tfoot.appendChild(tr2);
+}
+
+function applyFilters() { renderTable(); }
+
+// ── Fetch ────────────────────────────────────────────────────────────────────
+fetch('/api/modules')
+  .then(r => r.json())
+  .then(d => {
+    if (!d.ok) throw new Error(d.error);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('grid').style.display = '';
+    buildGrid(d.clients);
+  })
+  .catch(e => {
+    document.getElementById('loading').innerHTML =
+      `<span class="err">Failed to load: ${e.message}</span>`;
+  });
+</script>
+</body>
+</html>
