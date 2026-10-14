@@ -1,6 +1,7 @@
-// Fetches all projects (clients) in the implementation portfolio and their
-// sections (modules). Uses Asana OAuth refresh token to get a short-lived
-// access token on every cold request; result is cached for 5 minutes.
+// Fetches all projects (clients) in the implementation portfolio with:
+// - sections (modules) + per-section task counts (complete / total)
+// - project due_on, owner, gid for linking and sorting
+// Cached 5 min server-side; token refreshed on every cold request.
 
 const PORTFOLIO_GID = process.env.ASANA_PORTFOLIO_GID;
 const CLIENT_ID     = process.env.ASANA_CLIENT_ID;
@@ -22,46 +23,87 @@ async function getToken() {
     }),
   });
   const d = await r.json();
-  if (!d.access_token) throw new Error('Asana token refresh failed: ' + JSON.stringify(d));
+  if (!d.access_token) throw new Error('Token refresh failed: ' + JSON.stringify(d));
   return d.access_token;
 }
 
 async function asanaGet(url, token) {
   const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  if (!r.ok) throw new Error(`Asana ${url} → ${r.status}`);
+  if (!r.ok) throw new Error(`Asana ${r.status} → ${url}`);
   return r.json();
 }
 
-async function fetchData(token) {
-  // List all projects in the portfolio
-  const projects = [];
+// Fetch all pages of an Asana list endpoint into a flat array.
+async function asanaAll(base, token) {
+  const items = [];
   let offset = '';
   do {
-    const url = `https://app.asana.com/api/1.0/portfolios/${PORTFOLIO_GID}/items` +
-                `?opt_fields=name,gid,resource_type&limit=100` +
-                (offset ? `&offset=${offset}` : '');
+    const url = base + (base.includes('?') ? '&' : '?') + 'limit=100' + (offset ? `&offset=${offset}` : '');
     const d = await asanaGet(url, token);
-    for (const it of d.data || [])
-      if (it.resource_type === 'project') projects.push({ gid: it.gid, name: it.name });
+    items.push(...(d.data || []));
     offset = (d.next_page && d.next_page.offset) || '';
   } while (offset);
+  return items;
+}
 
-  // Fetch sections for each project in parallel (batched to avoid rate limit)
-  const BATCH = 10;
+async function fetchProjectData(p, token) {
+  try {
+    // Sections and tasks in parallel
+    const [sectionsRaw, tasksRaw] = await Promise.all([
+      asanaAll(
+        `https://app.asana.com/api/1.0/projects/${p.gid}/sections?opt_fields=name,gid`,
+        token
+      ),
+      asanaAll(
+        `https://app.asana.com/api/1.0/projects/${p.gid}/tasks?opt_fields=completed,memberships.section.gid`,
+        token
+      ),
+    ]);
+
+    // Count tasks per section gid
+    const counts = {};
+    for (const t of tasksRaw) {
+      for (const m of (t.memberships || [])) {
+        const sgid = m.section && m.section.gid;
+        if (!sgid) continue;
+        if (!counts[sgid]) counts[sgid] = { total: 0, complete: 0 };
+        counts[sgid].total++;
+        if (t.completed) counts[sgid].complete++;
+      }
+    }
+
+    return {
+      name:   p.name,
+      gid:    p.gid,
+      due_on: p.due_on  || null,
+      owner:  p.owner   ? p.owner.name : null,
+      sections: sectionsRaw.map(s => ({
+        name:     s.name,
+        gid:      s.gid,
+        total:    (counts[s.gid] || {}).total    || 0,
+        complete: (counts[s.gid] || {}).complete || 0,
+      })),
+    };
+  } catch {
+    return { name: p.name, gid: p.gid, due_on: null, owner: null, sections: [] };
+  }
+}
+
+async function fetchData(token) {
+  // Portfolio items: need name, gid, due_on, owner
+  const raw = await asanaAll(
+    `https://app.asana.com/api/1.0/portfolios/${PORTFOLIO_GID}/items` +
+    `?opt_fields=name,gid,resource_type,due_on,owner.name`,
+    token
+  );
+  const projects = raw.filter(x => x.resource_type === 'project');
+
+  // Fan out per project in batches of 5 to stay under Asana rate limit
+  const BATCH = 5;
   const clients = [];
   for (let i = 0; i < projects.length; i += BATCH) {
     const batch = projects.slice(i, i + BATCH);
-    const results = await Promise.all(batch.map(async p => {
-      try {
-        const d = await asanaGet(
-          `https://app.asana.com/api/1.0/projects/${p.gid}/sections?opt_fields=name,gid`,
-          token
-        );
-        return { name: p.name, sections: (d.data || []).map(s => s.name) };
-      } catch {
-        return { name: p.name, sections: [] };
-      }
-    }));
+    const results = await Promise.all(batch.map(p => fetchProjectData(p, token)));
     clients.push(...results);
   }
 
